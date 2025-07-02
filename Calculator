@@ -1,0 +1,76 @@
+import tkinter as tk
+import math
+
+just_evaluated = False  # Track if result was just shown
+
+def click(event):
+    global just_evaluated
+    text = event.widget.cget("text")
+    current_text = entry.get()
+
+    if text == "=":
+        try:
+            expression = current_text.replace("^", "**")
+            expression = expression.replace("%", "/100")
+
+            if "√" in expression:
+                num = expression.replace("√", "")
+                expression = f"math.sqrt({num})"
+
+            result = str(eval(expression, {"__builtins__": None}, {"math": math}))
+            entry.delete(0, tk.END)
+            entry.insert(0, result)
+            entry.config(fg="green")
+            just_evaluated = True  # Mark result shown
+        except:
+            entry.delete(0, tk.END)
+            entry.insert(0, "Error")
+            entry.config(fg="red")
+            just_evaluated = False
+    elif text == "C":
+        entry.delete(0, tk.END)
+        entry.config(fg="black")
+        just_evaluated = False
+    elif text == "⌫":
+        entry.delete(len(current_text)-1)
+        just_evaluated = False
+    else:
+        if just_evaluated and text in "0123456789.":
+            entry.delete(0, tk.END)  # Clear only if new value entered
+        entry.insert(tk.END, text)
+        entry.config(fg="black")
+        just_evaluated = False
+
+root = tk.Tk()
+root.title("Sarthak's Codsoft Calculator")
+root.geometry("360x520")
+root.resizable(0, 0)
+root.configure(bg="#d3d3d3", padx=10, pady=10)
+
+entry = tk.Entry(root, font=("Consolas bold", 24), bg="white", fg="black", justify="right", relief="flat", bd=5)
+entry.pack(fill=tk.BOTH, ipadx=8, ipady=5, pady=(0, 10))
+
+buttons = [
+    ["C", "⌫", "√", "^"],
+    ["7", "8", "9", "/"],
+    ["4", "5", "6", "*"],
+    ["1", "2", "3", "-"],
+    ["00", "0", ".", "+"],
+    ["%", "="]
+]
+
+btn_frame = tk.Frame(root, bg="#d3d3d3")
+btn_frame.pack()
+
+for row in buttons:
+    row_frame = tk.Frame(btn_frame, bg="#d3d3d3")
+    row_frame.pack(expand=True, fill="both", pady=5)
+    for btn_text in row:
+        if btn_text == "=":
+            btn = tk.Button(row_frame, text=btn_text, font="Arial 18 bold", bg="lightgreen", fg="black", relief="raised", bd=3)
+        else:
+            btn = tk.Button(row_frame, text=btn_text, font="Arial 18 bold", bg="grey", fg="white", relief="raised", bd=3)
+        btn.pack(side="left", expand=True, fill="both", padx=5, ipadx=10, ipady=3)
+        btn.bind("<Button-1>", click)
+
+root.mainloop()
